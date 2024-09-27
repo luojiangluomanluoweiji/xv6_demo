@@ -9,7 +9,7 @@ int main(int argc,char* argv[])
     printf("Usage:%s<num> \n",argv[0]);
     exit(1);
   }
-  if(sleep(atoi(argv[1]))<=0)
+  if(sleep(atoi(argv[1]))<0)
   {
     printf("sleep error");
   }

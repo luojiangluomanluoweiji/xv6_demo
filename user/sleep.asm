@@ -22,13 +22,13 @@ int main(int argc,char* argv[])
     printf("Usage:%s<num> \n",argv[0]);
     exit(1);
   }
-  if(sleep(atoi(argv[1]))<=0)
+  if(sleep(atoi(argv[1]))<0)
    e:	6588                	ld	a0,8(a1)
   10:	00000097          	auipc	ra,0x0
   14:	1c2080e7          	jalr	450(ra) # 1d2 <atoi>
   18:	00000097          	auipc	ra,0x0
   1c:	34a080e7          	jalr	842(ra) # 362 <sleep>
-  20:	02a05563          	blez	a0,4a <main+0x4a>
+  20:	02054563          	bltz	a0,4a <main+0x4a>
   {
     printf("sleep error");
   }

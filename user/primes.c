@@ -3,14 +3,24 @@
 #include "user/user.h"
 
 
-void print_arr(int* arr,int size)//copy
+void print_arr(char* arr,int size)//copy
 {
+  printf("a new print_arr\n");
   for(int i=0;i<size;i++)
   {
-    printf("a new print_arr\n");
     printf("%d \n",*(arr+i));
   }
   return;
+}
+
+void erase_arr(char* arr,int size)
+{
+  for(int i=0;i<size;i++)//copy
+  {
+	  *(arr+i)=0;
+  }
+  return;
+	
 }
 
 
@@ -23,27 +33,15 @@ int main(int argc,char* argv[])
       buf[i-2]=i;
     }
   //here should have a test to print buf
-  print_arr(buf,sizeof(buf));
+//  print_arr(buf,sizeof(buf));
 
 
 while(1)
   {
-    if(buf[0]!=2)//the first parent process can`t run this block
-    {
-      close(p[1])
-      int ret_read=read(p[0],buf,sizeof(p[0]));
-      if(ret_read==-1)
-      {
-        printf("read error\n");
-        exit(1);
-      }
-      close(p[0]);
-    }
 
     //break condition judge(just after get the prime,before creat another process)
-    if(sizeof(buf)==4)
+    if(buf[0]==0)
     {
-    printf("prime %d\n",buf[0]);//printf what i want;
     break;
     }
 
@@ -66,23 +64,38 @@ while(1)
     for(int i=1;i<sizeof(buf);i++)
       {
         if((buf[i]/buf[0])*buf[0]!=buf[i])//第i个数can`t be divided by buf[0]
-        write(p[0],&buf[i],sizeof(buf[i]));
+	{
+        write(p[1],&buf[i],sizeof(buf[i]));//take 0 as write ,666
+	}
       }
     close(p[1]);
 
-    wait();//here should be end of any process
+    wait(&pid);//here should be end of any process
+    exit(0);
 
   }
   else if(pid==0)
   {
+	sleep(10);
+	erase_arr(buf,sizeof(buf));
+      close(p[1]);
+      int ret_read=read(p[0],buf,sizeof(buf));
+      if(ret_read==-1)
+      {
+        printf("read error\n");
+        exit(1);
+      }
+      close(p[0]);
+ //     print_arr(buf,sizeof(buf));
+
       continue ;
   }
-  }
-  else 
+  else if(pid ==-1)
   {
     printf("fork error\n");
     exit(1);
   }
 }
+exit(0);
   return 0;
 }

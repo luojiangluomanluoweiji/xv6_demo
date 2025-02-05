@@ -1,83 +1,74 @@
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"
+#include "kernel/fs.h"
 
-char * fmtname(char* path)
+void find(char* path,char* target)
 {
-	char buf[DIRSIZ+1];//Why is it +1?
-	char *p;
-	
-	for(p=path+strlen(path);p>path&&p!='/';p--)
-		;
-	p++;
-	if(strlen(p)>DIRSIZ)
-		return p;
-
-	memcopy(buf,p,strlen(p));
-	memset(buf," ",DIRSIZ-strlen(p));
-	return buf;
-}
-
-void find(char *path)
-{
-	char buf[4096];
-	char *p;
+	char buf[512];
+	char* p;
 	int fd;
-	struct dirent direntry;
-	struct stat sta;
+	struct dirent de;
+	struct stat st;
 
-	if(open(path,0)==-1){
-		printf("find open error");
+	//if!
+	if((fd=open(path,0))<0){//forget 
+
+		fprintf(2,"find: cannot open %s\n",path);
+		return;
+	}
+	//if!
+	if(fstat(fd,&st)<0){
+		fprintf(2, "find: cannot stat %s\n", path);
+		close(fd);
+		return;
 	}
 
-	if(fstat(fd,&sta)==-1){
-		printf("find fstat error");
-	}
-
-	switch(sta.type)
-	{
+	switch(st.type){
 		case T_FILE:
-			printf("%s\n",fmtname(path);
-
-		case T_DIR:
-			while(read(fd,&direntry,sizeof(direntry))==sizeof(direntry)){
-			//not know what should be filled for the 3th pare;
-				if(strcmp(dirent.name,".")==0||strcmp(dirent.name,"..")==0)
-					continue;//not break!
-
-				//now I am add "/+dirent.name" to *path
-				p=dirent.name;
-				buf=p;
-				memset(buf,'/',1);
-				for(int i=strlen(buf);i<strlen(p);i++){
-					memset(buf,*p,1);
-					p++;
-				}
-
-				//end
-				find(buf);
-			}
-
-
-
+      if(strcmp(path+strlen(path)-strlen(target),target)==0){
+	      printf("%s\n",path);//*target or target?
 
 	}
+      break;
+		case T_DIR:
+      //first compare whether buf can contain somuch words
+	   
+      strcpy(buf,path);
+      p=buf+strlen(buf);
+      *p++='/';
 
-		
+      //I have no idea that while should be used when reading dir entry 
+      while(read(fd,&de,sizeof(de))==sizeof(de)){
+		      
+		      //inum?
+		      //
+		      if(de.inum==0) continue;
+		      memmove(p,de.name,DIRSIZ);//*?
+		      if(strcmp(buf+strlen(buf)-2,"/.")!=0&&strcmp(buf+strlen(buf)-3,"/..")!=0){
+		      find(buf,target);
 
+		      }
+
+		}
+		break;
+	}
+	close(fd);
 }
 
 int main(int argc,char* argv[])
 {
-	if(argc<2){
-		printf("argument is not enough");
+	//difference between char* argv[] and char* argv
+	if(argc<3){
+		printf("argument is too less\n");
+		exit(0);
 	}
 
-	for(int i=1;i<argc;i++){
-		find(argv[i]);
-	}
 
-	
-	
-	return 0;
+	char target[512];
+	target[0]='/';
+	strcpy(target+1,argv[2]);//should be check:argv[2]pointer?or not
+	find(argv[1],target);
+	exit(0);
 }
+
